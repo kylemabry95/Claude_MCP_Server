@@ -11,7 +11,7 @@ from mcp.server.fastmcp import FastMCP
 import ssl
 from typing import List, Dict, Any
 from typing import Dict, Any, Optional
-
+from git_hub_pr_fetcher import GitHubPRFetcher
 import requests
 import urllib3
 
@@ -73,7 +73,7 @@ def get_specified_pr(owner: str, repo: str, pr_number: int = 0) -> Dict[str, Any
         return pr_list
     
     # Get the latest PR (first in the sorted list)
-    latest_pr_number = pr_list['data'][pr_number]['number']
+    latest_pr_number = pr_list['data'][pr_number-1]['number']
     
     # Fetch detailed information about the latest PR
     pr_details = fetcher.fetch_pr_details(owner, repo, latest_pr_number)
