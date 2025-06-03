@@ -4,16 +4,14 @@
 # It uses the FastMCP framework for easy server creation and management.
 import json
 import os
-import httpx
 import sys
-import aiohttp
-from mcp.server.fastmcp import FastMCP
-import ssl
-from typing import List, Dict, Any
-from typing import Dict, Any, Optional
-from git_hub_pr_fetcher import GitHubPRFetcher
+import base64
+from typing import List, Dict, Any, Optional
+import httpx
 import requests
 import urllib3
+from mcp.server.fastmcp import FastMCP
+from git_hub_pr_fetcher import GitHubPRFetcher
 
 mcp = FastMCP("GitHub PR Server")
 
@@ -29,7 +27,7 @@ def list_pull_requests(repo: str, owner: str) -> str:
         url = f"https://api.github.com/repos/{owner}/{repo}/pulls"
         response = httpx.get(url)
         response.raise_for_status()
-        
+
         prs = response.json()
         result = []
         for pr in prs:
@@ -64,20 +62,20 @@ def get_specified_pr(owner: str, repo: str, pr_number: int = 0) -> Dict[str, Any
     """
     # Get access token from environment variable or use default
     token = os.getenv("GITHUB_TOKEN")
-    fetcher = GitHubPRFetcher(token)
-    
+    fetcher = GitHubPRFetcher(token) # type: ignore
+
     # First get the list of PRs
     pr_list = fetcher.list_pull_requests(owner, repo)
-    
+
     if not pr_list['success'] or not pr_list['data']:
         return pr_list
-    
+
     # Get the latest PR (first in the sorted list)
     latest_pr_number = pr_list['data'][pr_number-1]['number']
-    
+
     # Fetch detailed information about the latest PR
     pr_details = fetcher.fetch_pr_details(owner, repo, latest_pr_number)
-    
+
     if pr_details['success']:
         return {
             'success': True,
@@ -87,7 +85,7 @@ def get_specified_pr(owner: str, repo: str, pr_number: int = 0) -> Dict[str, Any
         }
     else:
         return pr_details
-    
+
 @mcp.tool()
 def get_repository_issues(owner: str, repo: str, state: str = "open", per_page: int = 30) -> List[Dict[str, Any]]:
     """
@@ -104,13 +102,13 @@ def get_repository_issues(owner: str, repo: str, state: str = "open", per_page: 
     """
     url = f"https://api.github.com/repos/{owner}/{repo}/issues"
     params = {"state": state, "per_page": min(per_page, 100)}
-    
+
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=10)
         response.raise_for_status()
         return response.json()
     except requests.RequestException as e:
-        return {"error": f"Failed to fetch issues: {str(e)}"}
+        return {"error": f"Failed to fetch issues: {str(e)}"} # type: ignore
 
 @mcp.tool()
 def get_repository_readme(owner: str, repo: str, branch: str = "main") -> Optional[str]:
@@ -125,9 +123,9 @@ def get_repository_readme(owner: str, repo: str, branch: str = "main") -> Option
     Returns:
         README content as string, or None if not found
     """
-    # Try common README filenames
+    # Try common README filenames 
     filenames = ["README.md", "README.rst", "README.txt", "README"]
-    
+
     for filename in filenames:
         url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{filename}"
         try:
@@ -153,13 +151,12 @@ def get_repository_file(owner: str, repo: str, file_path: str, branch: str = "ma
     """
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{file_path}"
     params = {"ref": branch}
-    
+
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=10)
         if response.status_code == 200:
             data = response.json()
             if data.get("encoding") == "base64":
-                import base64
                 return base64.b64decode(data["content"]).decode('utf-8')
         return None
     except Exception:
