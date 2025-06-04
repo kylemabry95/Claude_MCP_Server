@@ -51,13 +51,13 @@ A Model Context Protocol (MCP) server that provides tools for interacting with G
 ## Setup
 
 ### Prerequisites
-- Python 3.7+
-- Required packages: `fastmcp`, `httpx`, `requests`, `urllib3`
+- Python 3.11.9
+- Required packages: `fastmcp`, `httpx`, `requests`, `urllib3`, `mcp`, `typing`
 
 ### Installation
 
 ```bash
-pip install fastmcp httpx requests urllib3
+pip install fastmcp httpx requests urllib3 mcp typing
 ```
 
 ### Configuration
