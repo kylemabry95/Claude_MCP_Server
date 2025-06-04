@@ -9,7 +9,7 @@ Add the following code to the `./Library/Application\ Support/Claude/claude_desk
         "git-hub-server": {
             "command": "python3.11",
             "args": [
-                "Users/kylemabry/Documents/MCP_Practice/main.py"
+                "Users/{your_username}/Documents/MCP_Practice/main.py"
             ]
         }
     }
