@@ -1,5 +1,5 @@
 
-# This repository is a MCP for GitHub which allows Claude Desktop to perform various actions related to Pull Requests
+# Model Context Protocol (MCP) Server for GitHub using Claude Desktop
 
 
 Add the following code to the `./Library/Application\ Support/Claude/claude_desktop_config.json`
